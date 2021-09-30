@@ -2,7 +2,7 @@ applications:
 - path: .
   memory: 256M
   instances: 1
-  name: aulogin-dsudoku 
-  host: aulogin-dsudoku
+  name: mzl0097-dsudoku 
+  host: mzl0097-dsudoku
   disk_quota: 1024M
   buildpack: python_buildpack  

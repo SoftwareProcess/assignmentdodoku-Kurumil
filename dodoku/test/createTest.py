@@ -36,7 +36,7 @@ class CreateTest(TestCase):
         result = {}
         try:
             jsonString = theStringResponse.replace("'", "\"")
-            unicodeDictionary = json.loads(jsonString)
+            unicodeDictionary = json.loads(jsonString) 
             for element in unicodeDictionary:
                 if (isinstance(unicodeDictionary[element], str)):
                     result[str(element)] = str(unicodeDictionary[element])

@@ -7,15 +7,6 @@ import http.client
 import dodoku.insert as insert
 from dodoku.create import _get_integrity, _getcolumn, _get_grid_sha256
 
-class InsertTest(TestCase):
-    def setUp(self) -> None:
-        self.PATH = "/dodoku?"
-        self.PORT = 5000
-        self.URL = "localhost"
-        self.gridKey = 'grid'
-        self.integrityKey = 'integrity'
-        self.statusKey = 'status'
-        self.statusOk = 'ok' 
-        self.statusWarning = 'warning'
-        self.statusError = 'error:' 
-         
+    def test_valid_insert_1(self):
+        self._test_valid_insert(1,  1,  6)
+

@@ -18,4 +18,4 @@ class InsertTest(TestCase):
         self.statusOk = 'ok' 
         self.statusWarning = 'warning'
         self.statusError = 'error:' 
-         
+        

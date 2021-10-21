@@ -68,5 +68,9 @@ def _getcolumn(grid):
     flat_columns = [j for i in columns for j in i]
     return ''.join(map(str, flat_columns))
 
+def _get_grid_sha256(grid):
+    concat_columns = _getcolumn(grid)
+    hash_str = hashlib.sha256(concat_columns.encode()).hexdigest()
+    return hash_str
 
 

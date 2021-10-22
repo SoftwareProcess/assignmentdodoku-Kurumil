@@ -34,3 +34,13 @@ def _insert(parms):
         return {"status": "error: invalid cell reference"}
     if not _is_valid_cell(board, cell):
         return {"status": "error: invalid cell reference"}
+
+    ok, value = _parse_value(raw_text_value)
+    if not ok:
+        return {"status": "error: invalid value"}
+    if not _is_valid_value(value):
+        return {"status": "error: invalid value"}
+
+    if not _is_valid_integrity(grid, integrity):
+        return {"status": "error: integrity mismatch"}
+

@@ -86,3 +86,23 @@ def _is_valid_cell(board, cell):
         return False
     return True
 
+def _parse_grid(raw_grid_text):
+    try:
+        grid = json.loads(raw_grid_text)
+        return True, grid
+    except:
+        return False, None
+
+
+def _is_valid_grid(grid):
+    try:
+        assert isinstance(grid, list)
+        assert len(grid) == 153
+        assert all(isinstance(x, int) for x in grid)
+        assert all(abs(x) <= 9 for x in grid)
+        board = _gridlist_to_board(grid)
+        assert _is_valid_board(board)
+        return True
+    except:
+        return False
+

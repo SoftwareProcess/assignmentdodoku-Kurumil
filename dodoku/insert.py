@@ -192,4 +192,24 @@ def _is_valid_integrity(grid, integrity):
         isinstance(integrity, str) and len(integrity) == 8 and integrity in sha256_str
     )
 
+def _gridlist_to_board(grid):
+    # to 15x15 board
+    board = []
+    cur_index = 0
+    for _ in range(6):
+        row = grid[cur_index : cur_index + 9]
+        row = row + [None] * 6
+        board.append(row)
+
+        cur_index += 9
+    for _ in range(3):
+        board.append(grid[cur_index : cur_index + 15])
+        cur_index += 15
+    for _ in range(6):
+        row = grid[cur_index : cur_index + 9]
+        row = [None] * 6 + row
+        board.append(row)
+        cur_index += 9
+    return board
+
 

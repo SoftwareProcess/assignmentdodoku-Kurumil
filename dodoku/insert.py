@@ -66,3 +66,23 @@ def _check_keys(parms):
             return False, {"status": f"error: missing {key} reference"}
     return True, None
 
+def _parse_cell(raw_cell_text):
+    pat = r"^[rR](\d\d?)[cC](\d\d?)$"
+    m = re.fullmatch(pat, raw_cell_text)
+    if m is None:
+        return False, None
+    r = int(m[1])
+    c = int(m[2])
+    return True, (r, c)
+
+
+def _is_valid_cell(board, cell):
+    r, c = cell
+    if not 1 <= r <= 15:
+        return False
+    if not 1 <= c <= 15:
+        return False
+    if board[r - 1][c - 1] is None:
+        return False
+    return True
+

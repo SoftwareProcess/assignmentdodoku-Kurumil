@@ -33,6 +33,17 @@ class InsertTest(TestCase):
 
         """Convert JSON string to dictionary"""
         result = {}
-
+        try:
+            jsonString = theStringResponse.replace("'", '"')
+            unicodeDictionary = json.loads(jsonString)
+            for element in unicodeDictionary:
+                if isinstance(unicodeDictionary[element], str):
+                    result[str(element)] = str(unicodeDictionary[element])
+                else:
+                    result[str(element)] = unicodeDictionary[element]
+        except Exception as e:
+            result["diagnostic"] = str(e)
+        return result
+    
     
     

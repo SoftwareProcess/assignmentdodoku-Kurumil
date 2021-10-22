@@ -69,6 +69,5 @@ class InsertTest(TestCase):
                             'grid': f'[{",".join(map(str, inputGrid))}]'
                          }
 
-
     
     

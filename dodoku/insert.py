@@ -59,3 +59,10 @@ def _insert(parms):
 
     return result
 
+def _check_keys(parms):
+    keys = ["cell", "integrity", "grid"]
+    for key in keys:
+        if key not in parms.keys():
+            return False, {"status": f"error: missing {key} reference"}
+    return True, None
+

@@ -126,6 +126,23 @@ class InsertTest(TestCase):
                             'grid': f'[{",".join(map(str, inputGrid))}]'
                          }
 
+        del inputParmDict[key]
+
+
+        expectedOutputGrid = inputGrid.copy()
+        expectedOutputGrid[0] = 1
+        expectedIntegrity = _grid2column(expectedOutputGrid)
+        expectedStatus = 'error: missing'
+        
+        exptectedKeyCount = 1
+
+        actualResult = self.microservice(inputParmDict)
+        
+        actualKeyCount = len(actualResult)
+        self.assertEqual(actualKeyCount, exptectedKeyCount)
+
+        actualStatusValue = actualResult.get(self.statusKey, '')
+        self.assertEqual(actualStatusValue.startswith(expectedStatus), True)
 
 
 

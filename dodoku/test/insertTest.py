@@ -69,5 +69,29 @@ class InsertTest(TestCase):
                             'grid': f'[{",".join(map(str, inputGrid))}]'
                          }
 
+        board = insert._gridlist_to_board(inputGrid.copy())
+        board[r-1][c-1] = value
+        expectedOutputGrid = insert._board_to_grid_list(board)
+        
+        expectedIntegrity = _get_grid_sha256(expectedOutputGrid)
+        expectedStatus = 'ok'
+        exptectedKeyCount = 3
+
+        actualResult = self.microservice(inputParmDict)
+        # print(actualResult)
+        
+        actualKeyCount = len(actualResult)
+        self.assertEqual(actualKeyCount, exptectedKeyCount)
+
+        actualGridValue = actualResult.get(self.gridKey, [])
+        self.assertEqual(actualGridValue, expectedOutputGrid)
+
+        actualIntegrityValue = actualResult.get(self.integrityKey, '')
+        self.assertEqual(8, len(actualIntegrityValue))
+        self.assertIn(actualIntegrityValue, expectedIntegrity)
+
+        actualStatusValue = actualResult.get(self.statusKey, '')
+        self.assertEqual(actualStatusValue, expectedStatus)
+
     
     

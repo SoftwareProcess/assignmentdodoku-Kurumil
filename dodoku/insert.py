@@ -120,3 +120,17 @@ def _is_valid_nine_nums(nine_nums):
         else:
             s.add(num)
     return True
+
+def _is_valid_board(board):
+
+    for i in range(9):
+        row = board[i][:9]
+        nine_nums = [abs(x) for x in row]
+        if not _is_valid_nine_nums(nine_nums):
+            return False
+
+    for i in range(6, 15):
+        row = board[i][6:15]
+        nine_nums = [abs(x) for x in row]
+        if not _is_valid_nine_nums(nine_nums):
+            return False

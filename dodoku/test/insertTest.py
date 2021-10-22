@@ -144,6 +144,15 @@ class InsertTest(TestCase):
         actualStatusValue = actualResult.get(self.statusKey, '')
         self.assertEqual(actualStatusValue.startswith(expectedStatus), True)
 
+    def test_invalid_insert_key_missing_1(self):
+        self._test_invalid_insert_key_missing('integrity')
+
+    def test_invalid_insert_key_missing_2(self):
+        self._test_invalid_insert_key_missing('grid')
+
+    def test_invalid_insert_key_missing_3(self):
+        self._test_invalid_insert_key_missing('cell')
+
 
 
     

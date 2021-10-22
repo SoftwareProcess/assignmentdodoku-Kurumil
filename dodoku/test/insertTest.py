@@ -93,6 +93,16 @@ class InsertTest(TestCase):
         actualStatusValue = actualResult.get(self.statusKey, '')
         self.assertEqual(actualStatusValue, expectedStatus)
 
+    def test_valid_insert_1(self):
+        self._test_valid_insert(1,  1,  6)
+
+    def test_valid_insert_2(self):
+        self._test_valid_insert(1,  3,  5)
+
+    def test_valid_insert_3(self):
+        self._test_valid_insert(15,  7,  9)
+
+
 
     
     

@@ -171,4 +171,25 @@ def _is_valid_board(board):
 
     return True
 
+def _parse_value(raw_value_text):
+    try:
+        return True, int(raw_value_text)
+    except:
+        return False, None
+
+
+def _is_valid_value(value):
+    return -9 <= value <= 9
+
+
+def _parse_integrity(integrity):
+    return integrity
+
+
+def _is_valid_integrity(grid, integrity):
+    sha256_str = create._get_grid_sha256(grid)
+    return (
+        isinstance(integrity, str) and len(integrity) == 8 and integrity in sha256_str
+    )
+
 

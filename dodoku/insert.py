@@ -212,4 +212,15 @@ def _gridlist_to_board(grid):
         cur_index += 9
     return board
 
-
+def _board_to_grid_list(board):
+    grid = []
+    for r in range(6):
+        nums = board[r][:9]
+        grid.extend(nums)
+    for r in range(6, 9):
+        nums = board[r][:]
+        grid.extend(nums)
+    for r in range(9, 15):
+        nums = board[r][6:15]
+        grid.extend(nums)
+    return grid

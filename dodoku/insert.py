@@ -44,3 +44,18 @@ def _insert(parms):
     if not _is_valid_integrity(grid, integrity):
         return {"status": "error: integrity mismatch"}
 
+    r, c = cell
+    board = _gridlist_to_board(grid)
+    if board[r - 1][c - 1] < 0:
+        return {"status": "error: attempt to change fixed hint"}
+
+    board[r - 1][c - 1] = value
+    grid = _board_to_grid_list(board)
+    integrity = create._get_integrity(grid)
+    result = {"status": "ok", "grid": grid, "integrity": integrity}
+
+    if not _is_valid_board(board):
+        result["status"] = "warning"
+
+    return result
+

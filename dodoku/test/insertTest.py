@@ -44,6 +44,6 @@ class InsertTest(TestCase):
         except Exception as e:
             result["diagnostic"] = str(e)
         return result
-    
+
     
     

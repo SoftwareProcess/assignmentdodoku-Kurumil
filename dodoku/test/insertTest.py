@@ -191,6 +191,45 @@ class InsertTest(TestCase):
         actualStatusValue = actualResult.get(self.statusKey, '')
         self.assertEqual(actualStatusValue.startswith(expectedStatus), True)
 
+    def test_invalid_insert_invalid_integrity(self):
+        inputGrid = [ 0,-2, 0, 0,-1, 0, 0,-4, 0,
+                     -8, 0,-1,-9, 0, 0, 0, 0,-5,
+                      0, 0, 0, 0,-3, 0, 0,-1, 0,
+                      0,-3, 0, 0, 0, 0,-4, 0,-6,
+                     -5, 0,-9, 0, 0, 0, 0, 0,-7,
+                      0, 0, 0, 0, 0, 0,-2,-8, 0,
+                     -2, 0, 0,-6, 0, 0, 0, 0, 0, 0,-1,-4, 0,-6, 0,
+                      0, 0,-6, 0, 0,-3, 0, 0, 0,-2, 0, 0,-1, 0,-9,
+                      0,-4, 0,-5,-7, 0, 0, 0, 0, 0, 0,-7, 0, 0,-5,
+                                        0, 0,-6, 0, 0, 0, 0,-9, 0,
+                                       -2, 0, 0, 0, 0, 0,-4, 0,-8,
+                                       -7, 0,-9, 0, 0, 0, 0, 0, 0,
+                                        0,-5, 0, 0,-9, 0, 0, 0, 0,
+                                       -4, 0, 0,-6, 0,-3,-9, 0, 0,
+                                        0,-6, 0, 0,-5, 0, 0,-3,-1]
+        inputParmDict = {
+                            'op': 'insert',
+                            'cell': 'r1c1',
+                            'value': '1',
+                            'integrity': _get_integrity(inputGrid),
+                            'grid': f'[{",".join(map(str, inputGrid))}]'
+                         }
+
+        inputParmDict['integrity'] = inputParmDict['integrity'][:-1]+'@'
+
+        expectedOutputGrid = inputGrid.copy()
+        expectedOutputGrid[0] = 1
+        expectedIntegrity = _grid2column(expectedOutputGrid)
+        expectedStatus = "error: integrity mismatch"
+        exptectedKeyCount = 1
+
+        actualResult = self.microservice(inputParmDict)
+        
+        actualKeyCount = len(actualResult)
+        self.assertEqual(actualKeyCount, exptectedKeyCount)
+
+        actualStatusValue = actualResult.get(self.statusKey, '')
+        self.assertEqual(actualStatusValue.startswith(expectedStatus), True)
 
 
 

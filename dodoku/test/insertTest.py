@@ -4,7 +4,7 @@ import json
 import http.client
 
 import dodoku.insert as insert
-from dodoku.create import _get_integrity,_getcolumn, _get_grid_sha256
+from dodoku.create import _get_integrity, _get_grid_sha256
 
 class InsertTest(TestCase):
     def setUp(self) -> None:
@@ -131,7 +131,6 @@ class InsertTest(TestCase):
 
         expectedOutputGrid = inputGrid.copy()
         expectedOutputGrid[0] = 1
-        expectedIntegrity = _getcolumn(expectedOutputGrid)
         expectedStatus = 'error: missing'
         
         exptectedKeyCount = 1
@@ -179,7 +178,7 @@ class InsertTest(TestCase):
 
         expectedOutputGrid = inputGrid.copy()
         expectedOutputGrid[0] = 1
-        expectedIntegrity = _getcolumn(expectedOutputGrid)
+
         expectedStatus = 'error: invalid'
         exptectedKeyCount = 1
 
@@ -219,7 +218,6 @@ class InsertTest(TestCase):
 
         expectedOutputGrid = inputGrid.copy()
         expectedOutputGrid[0] = 1
-        expectedIntegrity = _getcolumn(expectedOutputGrid)
         expectedStatus = "error: integrity mismatch"
         exptectedKeyCount = 1
 

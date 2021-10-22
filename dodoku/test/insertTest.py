@@ -153,6 +153,29 @@ class InsertTest(TestCase):
     def test_invalid_insert_key_missing_3(self):
         self._test_invalid_insert_key_missing('cell')
 
+    def test_invalid_insert_invalid_value(self):
+        inputGrid = [ 0,-2, 0, 0,-1, 0, 0,-4, 0,
+                     -8, 0,-1,-9, 0, 0, 0, 0,-5,
+                      0, 0, 0, 0,-3, 0, 0,-1, 0,
+                      0,-3, 0, 0, 0, 0,-4, 0,-6,
+                     -5, 0,-9, 0, 0, 0, 0, 0,-7,
+                      0, 0, 0, 0, 0, 0,-2,-8, 0,
+                     -2, 0, 0,-6, 0, 0, 0, 0, 0, 0,-1,-4, 0,-6, 0,
+                      0, 0,-6, 0, 0,-3, 0, 0, 0,-2, 0, 0,-1, 0,-9,
+                      0,-4, 0,-5,-7, 0, 0, 0, 0, 0, 0,-7, 0, 0,-5,
+                                        0, 0,-6, 0, 0, 0, 0,-9, 0,
+                                       -2, 0, 0, 0, 0, 0,-4, 0,-8,
+                                       -7, 0,-9, 0, 0, 0, 0, 0, 0,
+                                        0,-5, 0, 0,-9, 0, 0, 0, 0,
+                                       -4, 0, 0,-6, 0,-3,-9, 0, 0,
+                                        0,-6, 0, 0,-5, 0, 0,-3,-1]
+        inputParmDict = {
+                            'op': 'insert',
+                            'cell': 'r1c1',
+                            'value': '10',
+                            'integrity': _get_integrity(inputGrid),
+                            'grid': f'[{",".join(map(str, inputGrid))}]'
+                         }
 
 
 

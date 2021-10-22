@@ -22,3 +22,15 @@ def _insert(parms):
     raw_text_cell = parms["cell"]
     raw_text_value = parms.get("value", "0")
     integrity = parms["integrity"]
+    ok, grid = _parse_grid(raw_text_grid)
+    if not ok:
+        return {"status": "error: invalid grid"}
+    if not _is_valid_grid(grid):
+        return {"status": "error: invalid grid"}
+    board = _gridlist_to_board(grid)
+
+    ok, cell = _parse_cell(raw_text_cell)
+    if not ok:
+        return {"status": "error: invalid cell reference"}
+    if not _is_valid_cell(board, cell):
+        return {"status": "error: invalid cell reference"}

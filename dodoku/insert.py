@@ -150,3 +150,13 @@ def _is_valid_board(board):
         nine_nums = [abs(x) for x in row]
         if not _is_valid_nine_nums(nine_nums):
             return False
+
+    for i in range(0, 9, 3):
+        for j in range(0, 9, 3):
+            nine_nums = []
+            for r in range(i, i + 3):
+                for c in range(j, j + 3):
+                    nine_nums.append(abs(board[r][c]))
+            if not _is_valid_nine_nums(nine_nums):
+                return False
+

@@ -17,6 +17,21 @@ class InsertTest(TestCase):
         self.statusOk = 'ok' 
         self.statusWarning = 'warning'
         self.statusError = 'error:' 
+    def microservice(self, parm=""):
+        """Issue HTTP Get and return result, which will be JSON string"""
+        try:
+            # print('request params keys -->', parm.keys())
+            theParm = urlencode(parm)
+            theConnection = http.client.HTTPConnection(self.URL, self.PORT)
+            theConnection.request("GET", self.PATH + theParm)
+            # print('request param --->', str(theParm))
+            responseContent = theConnection.getresponse().read()
+            # print(responseContent)
+            theStringResponse = str(responseContent, "utf-8")
+        except Exception as e:
+            theStringResponse = "{'diagnostic': '" + str(e) + "'}"
 
+        """Convert JSON string to dictionary"""
+        result = {}
     
     

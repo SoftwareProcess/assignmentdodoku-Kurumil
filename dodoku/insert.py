@@ -106,3 +106,17 @@ def _is_valid_grid(grid):
     except:
         return False
 
+def _is_valid_nine_nums(nine_nums):
+
+    for num in nine_nums:
+        if not num <= 9:
+            return False
+    s = set()
+    for num in nine_nums:
+        if num == 0:
+            continue
+        if num in s:
+            return False
+        else:
+            s.add(num)
+    return True

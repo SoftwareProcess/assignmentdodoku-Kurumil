@@ -134,3 +134,19 @@ def _is_valid_board(board):
         nine_nums = [abs(x) for x in row]
         if not _is_valid_nine_nums(nine_nums):
             return False
+
+    for c in range(9):
+        col = []
+        for r in range(9):
+            col.append(board[r][c])
+        nine_nums = [abs(x) for x in row]
+        if not _is_valid_nine_nums(nine_nums):
+            return False
+
+    for c in range(6, 15):
+        col = []
+        for r in range(6, 15):
+            col.append(board[r][c])
+        nine_nums = [abs(x) for x in row]
+        if not _is_valid_nine_nums(nine_nums):
+            return False

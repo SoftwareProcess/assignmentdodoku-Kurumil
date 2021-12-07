@@ -1,11 +1,14 @@
 import json
 import re
+from dodoku import create
+
 def _recommend(parms):
     ok, result = _check_keys(parms)
     if not ok:
         return result
     raw_text_grid = parms["grid"]
     raw_text_cell = parms["cell"]
+    integrity = parms["integrity"]
     ok, grid = _parse_grid(raw_text_grid)
     if not ok:
         return {"status": "error: invalid grid"}
@@ -18,6 +21,8 @@ def _recommend(parms):
         return {"status": "error: invalid cell reference"}
     if not _is_valid_cell(board, cell):
         return {"status": "error: invalid cell reference"}    
+    if not _is_valid_integrity(grid, integrity):
+        return {"status": "error: integrity mismatch"}    
     r, c = cell
     recommend_numbers = _get_recommendation_numbers(board,r,c)
     result = {'recommendation': recommend_numbers,'status':'ok'}
@@ -107,4 +112,10 @@ def _is_valid_grid(grid):
         assert all(abs(x) <= 9 for x in grid)
         return True
     except:
-        return False 
+        return False
+
+def _is_valid_integrity(grid, integrity):
+    sha256_str = create._get_grid_sha256(grid)
+    return (
+        isinstance(integrity, str) and len(integrity) == 8 and integrity in sha256_str
+    )

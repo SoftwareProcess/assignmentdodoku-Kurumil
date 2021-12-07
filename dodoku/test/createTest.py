@@ -147,4 +147,4 @@ class CreateTest(TestCase):
         for key in set1:
             self.assertIn(key, totalIntegrity)
             self.assertEqual(len(key), 8)
-        self.assertEqual(len(set1),57)
+        self.assertEqual(len(set1),56)

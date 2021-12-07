@@ -118,4 +118,4 @@ def _is_valid_integrity(grid, integrity):
     sha256_str = create._get_grid_sha256(grid)
     return (
         isinstance(integrity, str) and len(integrity) == 8 and integrity in sha256_str
-    )
+    ) 

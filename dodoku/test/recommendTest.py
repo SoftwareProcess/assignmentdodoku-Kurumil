@@ -68,7 +68,7 @@ class RecommendTest(TestCase):
                  'integrity': 'f0c31993'}
         result = recommend._recommend(parms)
         self.assertEqual(expectedResult, result)
-
+    #Sad path test
     def test110_040AbormalInput(self):
         expectedResult = {'status':'error: integrity mismatch'}
         parms = {'op': 'recommend', 'cell': 'r7c9', 

@@ -1,9 +1,16 @@
 import json
 import re
 def _recommend(parms):
+    ok, result = _check_keys(parms)
+    if not ok:
+        return result
     raw_text_grid = parms["grid"]
     raw_text_cell = parms["cell"]
     ok, grid = _parse_grid(raw_text_grid)
+    if not ok:
+        return {"status": "error: invalid grid"}
+    if not _is_valid_grid(grid):
+        return {"status": "error: invalid grid"}    
     board = _gridlist_to_board(grid)
 
     ok, cell = _parse_cell(raw_text_cell)
@@ -83,4 +90,21 @@ def _is_valid_cell(board, cell):
         return False
     if board[r - 1][c - 1] is None:
         return False
-    return True 
+    return True
+
+def _check_keys(parms):
+    keys = ["cell", "integrity", "grid"]
+    for key in keys:
+        if key not in parms.keys():
+            return False, {"status": f"error: missing {key} reference"}
+    return True, None
+
+def _is_valid_grid(grid):
+    try:
+        assert isinstance(grid, list)
+        assert len(grid) == 153
+        assert all(isinstance(x, int) for x in grid)
+        assert all(abs(x) <= 9 for x in grid)
+        return True
+    except:
+        return False 

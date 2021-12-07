@@ -7,6 +7,10 @@ def _recommend(parms):
     board = _gridlist_to_board(grid)
 
     ok, cell = _parse_cell(raw_text_cell)
+    if not ok:
+        return {"status": "error: invalid cell reference"}
+    if not _is_valid_cell(board, cell):
+        return {"status": "error: invalid cell reference"}    
     r, c = cell
     recommend_numbers = _get_recommendation_numbers(board,r,c)
     result = {'recommendation': recommend_numbers,'status':'ok'}
@@ -70,3 +74,13 @@ def _get_recommendation_numbers(board,r,c):
     numbers = row_numbers.union(col_numbers).union(subgrid_numbers)
     recommend_numbers = (all_numbers - numbers)
     return sorted(list(recommend_numbers))
+
+def _is_valid_cell(board, cell):
+    r, c = cell
+    if not 1 <= r <= 15:
+        return False
+    if not 1 <= c <= 15:
+        return False
+    if board[r - 1][c - 1] is None:
+        return False
+    return True 

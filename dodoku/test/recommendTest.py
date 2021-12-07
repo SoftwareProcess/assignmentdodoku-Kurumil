@@ -43,3 +43,13 @@ class RecommendTest(TestCase):
         result = recommend._recommend(parms)
         self.assertEqual(expectedResult['recommendation'], result['recommendation'])
         self.assertEqual(expectedResult['status'], result['status'])
+    
+    #Happy path test
+    def test110_010AbormalInput(self):
+        expectedResult = {'status':'error: invalid cell reference'}
+        parms = {'op': 'recommend', 'cell': 'r1c10', 
+                 'grid': '[0,-2,5,6,-1,6,9,-4,3,-8,0,-1,-9,0,0,0,0,-5,0,0,0,0,-3,0,0,-1,0,0,-3,0,0,0,0,-4,0,-6,-5,0,-9,0,0,0,0,0,-7,0,0,0,0,0,0,-2,-8,0,-2,0,0,-6,0,0,0,0,0,0,-1,-4,0,-6,0,0,0,-6,0,0,-3,0,0,0,-2,0,0,-1,0,-9,0,-4,0,-5,-7,0,0,0,0,0,0,-7,0,0,-5,0,0,-6,0,0,0,0,-9,0,-2,0,0,0,0,0,-4,0,-8,-7,0,-9,0,0,0,0,0,0,0,-5,0,0,-9,0,0,0,0,-4,0,0,-6,0,-3,-9,0,0,0,-6,0,0,-5,0,0,-3,-1]', 
+                 'integrity': 'fc0e21e5'}
+        actualResult = recommend._recommend(parms)
+        self.assertEqual(expectedResult, actualResult) 
+        

@@ -11,23 +11,17 @@ from dodoku import create
 
 
 def _insert(parms):
-    # parms:
-    # {
-    #     "op": "insert",
-    #     "cell": "r1c1",
-    #     "value": "1",
-    #     "integrity": "5f3e8318",
-    #     "grid": "[0,-2,0,0,-1,0,0,-4,0,-8,0,-1,-9,0,0,0,0,-5,0,0,0,0,-3,0,0,-1,0,0,-3,0,0,0,0,-4,0,-6,-5,0,-9,0,0,0,0,0,-7,0,0,0,0,0,0,-2,-8,0,-2,0,0,-6,0,0,0,0,0,0,-1,-4,0,-6,0,0,0,-6,0,0,-3,0,0,0,-2,0,0,-1,0,-9,0,-4,0,-5,-7,0,0,0,0,0,0,-7,0,0,-5,0,0,-6,0,0,0,0,-9,0,-2,0,0,0,0,0,-4,0,-8,-7,0,-9,0,0,0,0,0,0,0,-5,0,0,-9,0,0,0,0,-4,0,0,-6,0,-3,-9,0,0,0,-6,0,0,-5,0,0,-3,-1]",
-    # }
-
     ok, result = _check_keys(parms)
     if not ok:
         return result
 
     raw_text_grid = parms["grid"]
     raw_text_cell = parms["cell"]
+    if "value" in parms and parms["value"]=='0':
+        return {'status':'error: invalid value'}
     raw_text_value = parms.get("value", "0")
     integrity = parms["integrity"]
+
     ok, grid = _parse_grid(raw_text_grid)
     if not ok:
         return {"status": "error: invalid grid"}
@@ -60,10 +54,11 @@ def _insert(parms):
     integrity = create._get_integrity(grid)
     result = {"status": "ok", "grid": grid, "integrity": integrity}
 
-    if not _is_valid_board(board):
+    if _is_valid_board(board,r,c):
         result["status"] = "warning"
 
     return result
+
 
 def _check_keys(parms):
     keys = ["cell", "integrity", "grid"]
@@ -71,6 +66,7 @@ def _check_keys(parms):
         if key not in parms.keys():
             return False, {"status": f"error: missing {key} reference"}
     return True, None
+
 
 def _parse_cell(raw_cell_text):
     pat = r"^[rR](\d\d?)[cC](\d\d?)$"
@@ -92,6 +88,7 @@ def _is_valid_cell(board, cell):
         return False
     return True
 
+
 def _parse_grid(raw_grid_text):
     try:
         grid = json.loads(raw_grid_text)
@@ -106,76 +103,30 @@ def _is_valid_grid(grid):
         assert len(grid) == 153
         assert all(isinstance(x, int) for x in grid)
         assert all(abs(x) <= 9 for x in grid)
-        board = _gridlist_to_board(grid)
-        assert _is_valid_board(board)
         return True
     except:
         return False
 
-def _is_valid_nine_nums(nine_nums):
-
-    for num in nine_nums:
-        if not num <= 9:
-            return False
-    s = set()
-    for num in nine_nums:
-        if num == 0:
-            continue
-        if num in s:
-            return False
-        else:
-            s.add(num)
-    return True
-
-def _is_valid_board(board):
-
-    for i in range(9):
-        row = board[i][:9]
-        nine_nums = [abs(x) for x in row]
-        if not _is_valid_nine_nums(nine_nums):
-            return False
-
-    for i in range(6, 15):
-        row = board[i][6:15]
-        nine_nums = [abs(x) for x in row]
-        if not _is_valid_nine_nums(nine_nums):
-            return False
-
-    for c in range(9):
-        col = []
-        for r in range(9):
-            col.append(board[r][c])
-        nine_nums = [abs(x) for x in row]
-        if not _is_valid_nine_nums(nine_nums):
-            return False
-
-    for c in range(6, 15):
-        col = []
-        for r in range(6, 15):
-            col.append(board[r][c])
-        nine_nums = [abs(x) for x in row]
-        if not _is_valid_nine_nums(nine_nums):
-            return False
-
-    for i in range(0, 9, 3):
-        for j in range(0, 9, 3):
-            nine_nums = []
-            for r in range(i, i + 3):
-                for c in range(j, j + 3):
-                    nine_nums.append(abs(board[r][c]))
-            if not _is_valid_nine_nums(nine_nums):
-                return False
-
-    for i in range(6, 15, 3):
-        for j in range(6, 15, 3):
-            nine_nums = []
-            for r in range(i, i + 3):
-                for c in range(j, j + 3):
-                    nine_nums.append(abs(board[r][c]))
-            if not _is_valid_nine_nums(nine_nums):
-                return False
-
-    return True
+def _is_valid_board(board,r,c):
+    value = board[r-1][c-1]
+    board[r-1][c-1] = 0
+    row_numbers = set()
+    for num in board[r-1]:
+        if num:
+            row_numbers.add(abs(num))
+    col_numbers = set()
+    for row in range(0,15):
+        if board[row][c-1]:
+            col_numbers.add(abs(board[row][c-1]))
+    subgrid_numbers = set()
+    row_start_index = (r-1)//3*3
+    col_start_index = (c-1)//3*3
+    for row in range(row_start_index, row_start_index+3):
+        for col in range(col_start_index, col_start_index+3):
+            if board[row][col]:
+                subgrid_numbers.add(abs(board[row][col]))
+    numbers = row_numbers.union(col_numbers).union(subgrid_numbers)
+    return value in numbers
 
 def _parse_value(raw_value_text):
     try:
@@ -185,7 +136,7 @@ def _parse_value(raw_value_text):
 
 
 def _is_valid_value(value):
-    return -9 <= value <= 9
+    return 0 <= value <= 9
 
 
 def _parse_integrity(integrity):
@@ -198,8 +149,8 @@ def _is_valid_integrity(grid, integrity):
         isinstance(integrity, str) and len(integrity) == 8 and integrity in sha256_str
     )
 
+
 def _gridlist_to_board(grid):
-    # to 15x15 board
     board = []
     cur_index = 0
     for _ in range(6):
@@ -217,6 +168,7 @@ def _gridlist_to_board(grid):
         board.append(row)
         cur_index += 9
     return board
+
 
 def _board_to_grid_list(board):
     grid = []

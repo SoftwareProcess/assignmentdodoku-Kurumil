@@ -39,38 +39,38 @@ def _create(parms):
                           -2, 0, 0, 0, 0, 0, 0, 0, -6, 0, 0, 0, 0]
     else:
         return {'status': 'error: invalid level!'}
-
-# return grid, status
-    result['integrity'] = _get_integrity(result['grid'])
     result['status'] = 'ok'
+    result['integrity'] = _get_integrity(result['grid'])
     return result
+
 
 # integrity functions
 def _get_integrity(grid):
     concat_columns = _getcolumn(grid)
-    hash_str = hashlib.sha256(concat_columns.encode()).hexdigest()
+    myHash = hashlib.sha256(concat_columns.encode()).hexdigest()
     random_start = random.randrange(0, 64 - 8)
-    return hash_str[random_start:random_start + 8]
+    return myHash[random_start:random_start + 8]
 
-# get column
 def _getcolumn(grid):
-    columns = []
-    for i in range(9):
-        columns.append(grid[:54][i::9])
-    for i in range(9):
-        columns[i].extend(grid[54:99][i::15])
-    for i in range(3):
-        columns[i + 6].extend(grid[99:][i::9])
-    for i in range(6):
-        columns.append(grid[54:99][(i + 9)::15])
-    for i in range(6):
-        columns[i + 9].extend(grid[99:][(i + 3)::9])
-    flat_columns = [j for i in columns for j in i]
-    return ''.join(map(str, flat_columns))
+    columns = []*15
+    for col in range(1,16):
+        for row in range(1,16):
+            if(row>9 and col<=6): continue
+            if(col>9 and row<=6): continue
+            columns.append(grid[_getIndex(row,col)])
+    return ''.join(map(str, columns))
+
+def _getIndex(row,col):
+    index = 0
+    if(row<=6):
+        index = (row-1)*9+col
+    elif(row>6 and row<=9):
+        index = 54 + (row-7)*15+col
+    else:
+        index = 99 + (row-10)*9 + (col-6)
+    return index-1
 
 def _get_grid_sha256(grid):
     concat_columns = _getcolumn(grid)
     hash_str = hashlib.sha256(concat_columns.encode()).hexdigest()
     return hash_str
-
-

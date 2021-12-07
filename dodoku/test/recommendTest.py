@@ -1,5 +1,4 @@
 from unittest import TestCase
-import dodoku.status as recommend 
 import dodoku.recommend as recommend 
 
 class RecommendTest(TestCase):

@@ -39,18 +39,17 @@ def _create(parms):
                           -2, 0, 0, 0, 0, 0, 0, 0, -6, 0, 0, 0, 0]
     else:
         return {'status': 'error: invalid level!'}
-
-# return grid, status
-    result['integrity'] = _get_integrity(result['grid'])
     result['status'] = 'ok'
+    result['integrity'] = _get_integrity(result['grid'])
     return result
+
 
 # integrity functions
 def _get_integrity(grid):
     concat_columns = _getcolumn(grid)
-    hash_str = hashlib.sha256(concat_columns.encode()).hexdigest()
+    myHash = hashlib.sha256(concat_columns.encode()).hexdigest()
     random_start = random.randrange(0, 64 - 8)
-    return hash_str[random_start:random_start + 8]
+    return myHash[random_start:random_start + 8]
 
 def _getcolumn(grid):
     columns = []*15

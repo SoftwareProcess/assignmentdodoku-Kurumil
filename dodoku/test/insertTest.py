@@ -1,230 +1,100 @@
 from unittest import TestCase 
-from urllib.parse import urlencode
-import json
-import http.client
-
 import dodoku.insert as insert
-from dodoku.create import _get_integrity, _get_grid_sha256
 
 class InsertTest(TestCase):
-    def setUp(self) -> None:
-        self.PATH = "/dodoku?"
-        self.PORT = 5000
-        self.URL = "localhost"
-        self.gridKey = 'grid'
-        self.integrityKey = 'integrity'
-        self.statusKey = 'status'
-        self.statusOk = 'ok' 
-        self.statusWarning = 'warning'
-        self.statusError = 'error:' 
-    def microservice(self, parm=""):
-        """Issue HTTP Get and return result, which will be JSON string"""
-        try:
-            # print('request params keys -->', parm.keys())
-            theParm = urlencode(parm)
-            theConnection = http.client.HTTPConnection(self.URL, self.PORT)
-            theConnection.request("GET", self.PATH + theParm)
-            # print('request param --->', str(theParm))
-            responseContent = theConnection.getresponse().read()
-            # print(responseContent)
-            theStringResponse = str(responseContent, "utf-8")
-        except Exception as e:
-            theStringResponse = "{'diagnostic': '" + str(e) + "'}"
+    
+    #Happy path test
+    
+    def test100_010NormalInput(self):
+        expectedResult = {'grid': [0,-2,0,0,-1,0,0,-4,0,-8,0,-1,-9,0,0,0,0,-5,0,0,0,0,-3,0,0,-1,0,0,-3,0,0,0,0,-4,0,-6,-5,0,-9,0,0,0,0,0,-7,0,0,0,0,0,0,-2,-8,0,-2,0,0,-6,0,0,0,0,3,0,-1,-4,0,-6,0,0,0,-6,0,0,-3,0,0,0,-2,0,0,-1,0,-9,0,-4,0,-5,-7,0,0,0,0,0,0,-7,0,0,-5,0,0,-6,0,0,0,0,-9,0,-2,0,0,0,0,0,-4,0,-8,-7,0,-9,0,0,0,0,0,0,0,-5,0,0,-9,0,0,0,0,-4,0,0,-6,0,-3,-9,0,0,0,-6,0,0,-5,0,0,-3,-1],
+                          'integrity': '72a87aa0938dfb1b7edf4c31cd75bb0db75e916ff3f7ea9c1671cdd569cef463',
+                          'status':'ok'}        
+        parms = {'op': 'insert', 'value': '3', 'cell': 'r7c9', 
+                 'grid': '[0,-2,0,0,-1,0,0,-4,0,-8,0,-1,-9,0,0,0,0,-5,0,0,0,0,-3,0,0,-1,0,0,-3,0,0,0,0,-4,0,-6,-5,0,-9,0,0,0,0,0,-7,0,0,0,0,0,0,-2,-8,0,-2,0,0,-6,0,0,0,0,0,0,-1,-4,0,-6,0,0,0,-6,0,0,-3,0,0,0,-2,0,0,-1,0,-9,0,-4,0,-5,-7,0,0,0,0,0,0,-7,0,0,-5,0,0,-6,0,0,0,0,-9,0,-2,0,0,0,0,0,-4,0,-8,-7,0,-9,0,0,0,0,0,0,0,-5,0,0,-9,0,0,0,0,-4,0,0,-6,0,-3,-9,0,0,0,-6,0,0,-5,0,0,-3,-1]', 
+                 'integrity': 'b1732888'}
+        result = insert._insert(parms)
+        self.assertEqual(expectedResult['grid'], result['grid'])
+        self.assertIn(result['integrity'], expectedResult['integrity'])
+        self.assertEqual(expectedResult['status'], result['status'])     
 
-        """Convert JSON string to dictionary"""
-        result = {}
-        try:
-            jsonString = theStringResponse.replace("'", '"')
-            unicodeDictionary = json.loads(jsonString)
-            for element in unicodeDictionary:
-                if isinstance(unicodeDictionary[element], str):
-                    result[str(element)] = str(unicodeDictionary[element])
-                else:
-                    result[str(element)] = unicodeDictionary[element]
-        except Exception as e:
-            result["diagnostic"] = str(e)
-        return result
-
-    def _test_valid_insert(self, r, c, value):
-        inputGrid = [ 0,-2, 0, 0,-1, 0, 0,-4, 0,
-                     -8, 0,-1,-9, 0, 0, 0, 0,-5,
-                      0, 0, 0, 0,-3, 0, 0,-1, 0,
-                      0,-3, 0, 0, 0, 0,-4, 0,-6,
-                     -5, 0,-9, 0, 0, 0, 0, 0,-7,
-                      0, 0, 0, 0, 0, 0,-2,-8, 0,
-                     -2, 0, 0,-6, 0, 0, 0, 0, 0, 0,-1,-4, 0,-6, 0,
-                      0, 0,-6, 0, 0,-3, 0, 0, 0,-2, 0, 0,-1, 0,-9,
-                      0,-4, 0,-5,-7, 0, 0, 0, 0, 0, 0,-7, 0, 0,-5,
-                                        0, 0,-6, 0, 0, 0, 0,-9, 0,
-                                       -2, 0, 0, 0, 0, 0,-4, 0,-8,
-                                       -7, 0,-9, 0, 0, 0, 0, 0, 0,
-                                        0,-5, 0, 0,-9, 0, 0, 0, 0,
-                                       -4, 0, 0,-6, 0,-3,-9, 0, 0,
-                                        0,-6, 0, 0,-5, 0, 0,-3,-1]
-        inputParmDict = {
-                            'op': 'insert',
-                            'cell': f'r{r}c{c}',
-                            'value': f'{value}',
-                            'integrity': _get_integrity(inputGrid),
-                            'grid': f'[{",".join(map(str, inputGrid))}]'
-                         }
-
-        board = insert._gridlist_to_board(inputGrid.copy())
-        board[r-1][c-1] = value
-        expectedOutputGrid = insert._board_to_grid_list(board)
+    def test100_020NormalInput(self):
+        expectedResult = {'grid': [0,-2,0,0,-1,0,0,-4,0,-8,0,-1,-9,0,0,0,0,-5,0,0,0,0,-3,0,0,-1,0,0,-3,0,0,0,0,-4,0,-6,-5,0,-9,0,0,0,0,0,-7,0,0,0,0,0,0,-2,-8,0,-2,0,0,-6,0,0,0,0,0,0,-1,-4,0,-6,0,0,0,-6,0,0,-3,0,0,0,-2,0,0,-1,0,-9,0,-4,0,-5,-7,0,0,0,0,0,0,-7,0,0,-5,0,0,-6,0,0,0,0,-9,0,-2,0,0,0,0,0,-4,0,-8,-7,0,-9,0,0,0,0,0,0,0,-5,0,0,-9,0,0,0,0,-4,0,0,-6,0,-3,-9,0,0,0,-6,0,0,-5,0,0,-3,-1],
+                          'integrity': '5a3f0c31993d46bcb2ab5f3e8318e734231ee8bdb26cba545fadd7b1732888cd',
+                          'status':'ok'}
+        parms = {'op': 'insert', 'cell': 'r7c9', 
+                 'grid': '[0,-2,0,0,-1,0,0,-4,0,-8,0,-1,-9,0,0,0,0,-5,0,0,0,0,-3,0,0,-1,0,0,-3,0,0,0,0,-4,0,-6,-5,0,-9,0,0,0,0,0,-7,0,0,0,0,0,0,-2,-8,0,-2,0,0,-6,0,0,0,0,3,0,-1,-4,0,-6,0,0,0,-6,0,0,-3,0,0,0,-2,0,0,-1,0,-9,0,-4,0,-5,-7,0,0,0,0,0,0,-7,0,0,-5,0,0,-6,0,0,0,0,-9,0,-2,0,0,0,0,0,-4,0,-8,-7,0,-9,0,0,0,0,0,0,0,-5,0,0,-9,0,0,0,0,-4,0,0,-6,0,-3,-9,0,0,0,-6,0,0,-5,0,0,-3,-1]', 
+                 'integrity': '69cef463'}
+        result = insert._insert(parms)
+        self.assertEqual(expectedResult['grid'], result['grid'])
+        self.assertIn(result['integrity'], expectedResult['integrity'])
+        self.assertEqual(expectedResult['status'], result['status'])       
+    
+    def test100_030NormalInput(self):
+        expectedResult = {'grid': [0,-2,0,0,-1,0,0,-4,0,-8,0,-1,-9,0,0,0,0,-5,0,0,0,0,-3,0,0,-1,0,0,-3,0,0,0,0,-4,0,-6,-5,0,-9,0,0,0,0,0,-7,0,0,0,0,0,0,-2,-8,0,-2,0,0,-6,0,0,0,0,5,0,-1,-4,0,-6,0,0,0,-6,0,0,-3,0,0,0,-2,0,0,-1,0,-9,0,-4,0,-5,-7,0,0,0,0,0,0,-7,0,0,-5,0,0,-6,0,0,0,0,-9,0,-2,0,0,0,0,0,-4,0,-8,-7,0,-9,0,0,0,0,0,0,0,-5,0,0,-9,0,0,0,0,-4,0,0,-6,0,-3,-9,0,0,0,-6,0,0,-5,0,0,-3,-1],
+                          'integrity': '2a2706879b00dc00937cea6d2f057b72bd1141ab09fd1b1e8a5c53f6fb6789db',
+                          'status':'warning'}
+        parms = {'op': 'insert', 'value':'5', 'cell': 'r7c9', 
+                 'grid': '[0,-2,0,0,-1,0,0,-4,0,-8,0,-1,-9,0,0,0,0,-5,0,0,0,0,-3,0,0,-1,0,0,-3,0,0,0,0,-4,0,-6,-5,0,-9,0,0,0,0,0,-7,0,0,0,0,0,0,-2,-8,0,-2,0,0,-6,0,0,0,0,0,0,-1,-4,0,-6,0,0,0,-6,0,0,-3,0,0,0,-2,0,0,-1,0,-9,0,-4,0,-5,-7,0,0,0,0,0,0,-7,0,0,-5,0,0,-6,0,0,0,0,-9,0,-2,0,0,0,0,0,-4,0,-8,-7,0,-9,0,0,0,0,0,0,0,-5,0,0,-9,0,0,0,0,-4,0,0,-6,0,-3,-9,0,0,0,-6,0,0,-5,0,0,-3,-1]', 
+                 'integrity': 'b1732888'}
+        result = insert._insert(parms)
+        self.assertEqual(expectedResult['grid'], result['grid'])
+        self.assertIn(result['integrity'], expectedResult['integrity'])
+        self.assertEqual(expectedResult['status'], result['status'])
         
-        expectedIntegrity = _get_grid_sha256(expectedOutputGrid)
-        expectedStatus = 'ok'
-        exptectedKeyCount = 3
+    # Sad path test
+    
+    def test110_010AbormalInput(self):
+        expectedResult = {'status':'error: invalid cell reference'}
+        parms = {'op': 'insert', 'value': '1', 'cell': 'r10c1', 
+                 'grid': '[0,-2,0,0,-1,0,0,-4,0,-8,0,-1,-9,0,0,0,0,-5,0,0,0,0,-3,0,0,-1,0,0,-3,0,0,0,0,-4,0,-6,-5,0,-9,0,0,0,0,0,-7,0,0,0,0,0,0,-2,-8,0,-2,0,0,-6,0,0,0,0,0,0,-1,-4,0,-6,0,0,0,-6,0,0,-3,0,0,0,-2,0,0,-1,0,-9,0,-4,0,-5,-7,0,0,0,0,0,0,-7,0,0,-5,0,0,-6,0,0,0,0,-9,0,-2,0,0,0,0,0,-4,0,-8,-7,0,-9,0,0,0,0,0,0,0,-5,0,0,-9,0,0,0,0,-4,0,0,-6,0,-3,-9,0,0,0,-6,0,0,-5,0,0,-3,-1]', 
+                 'integrity': 'ba545fad'}
+        result = insert._insert(parms)
+        self.assertDictEqual(expectedResult, result)
 
-        actualResult = self.microservice(inputParmDict)
-        # print(actualResult)
-        
-        actualKeyCount = len(actualResult)
-        self.assertEqual(actualKeyCount, exptectedKeyCount)
-
-        actualGridValue = actualResult.get(self.gridKey, [])
-        self.assertEqual(actualGridValue, expectedOutputGrid)
-
-        actualIntegrityValue = actualResult.get(self.integrityKey, '')
-        self.assertEqual(8, len(actualIntegrityValue))
-        self.assertIn(actualIntegrityValue, expectedIntegrity)
-
-        actualStatusValue = actualResult.get(self.statusKey, '')
-        self.assertEqual(actualStatusValue, expectedStatus)
-
-    def test_valid_insert_1(self):
-        self._test_valid_insert(1,  1,  6)
-
-    def test_valid_insert_2(self):
-        self._test_valid_insert(1,  3,  5)
-
-    def test_valid_insert_3(self):
-        self._test_valid_insert(15,  7,  9)
-
-    def _test_invalid_insert_key_missing(self, key):
-        inputGrid = [ 0,-2, 0, 0,-1, 0, 0,-4, 0,
-                     -8, 0,-1,-9, 0, 0, 0, 0,-5,
-                      0, 0, 0, 0,-3, 0, 0,-1, 0,
-                      0,-3, 0, 0, 0, 0,-4, 0,-6,
-                     -5, 0,-9, 0, 0, 0, 0, 0,-7,
-                      0, 0, 0, 0, 0, 0,-2,-8, 0,
-                     -2, 0, 0,-6, 0, 0, 0, 0, 0, 0,-1,-4, 0,-6, 0,
-                      0, 0,-6, 0, 0,-3, 0, 0, 0,-2, 0, 0,-1, 0,-9,
-                      0,-4, 0,-5,-7, 0, 0, 0, 0, 0, 0,-7, 0, 0,-5,
-                                        0, 0,-6, 0, 0, 0, 0,-9, 0,
-                                       -2, 0, 0, 0, 0, 0,-4, 0,-8,
-                                       -7, 0,-9, 0, 0, 0, 0, 0, 0,
-                                        0,-5, 0, 0,-9, 0, 0, 0, 0,
-                                       -4, 0, 0,-6, 0,-3,-9, 0, 0,
-                                        0,-6, 0, 0,-5, 0, 0,-3,-1]
-        inputParmDict = {
-                            'op': 'insert',
-                            'cell': 'r1c1',
-                            'value': '1',
-                            'integrity': _get_integrity(inputGrid),
-                            'grid': f'[{",".join(map(str, inputGrid))}]'
-                         }
-
-        del inputParmDict[key]
-
-
-        expectedOutputGrid = inputGrid.copy()
-        expectedOutputGrid[0] = 1
-        expectedStatus = 'error: missing'
-        
-        exptectedKeyCount = 1
-
-        actualResult = self.microservice(inputParmDict)
-        
-        actualKeyCount = len(actualResult)
-        self.assertEqual(actualKeyCount, exptectedKeyCount)
-
-        actualStatusValue = actualResult.get(self.statusKey, '')
-        self.assertEqual(actualStatusValue.startswith(expectedStatus), True)
-
-    def test_invalid_insert_key_missing_1(self):
-        self._test_invalid_insert_key_missing('integrity')
-
-    def test_invalid_insert_key_missing_2(self):
-        self._test_invalid_insert_key_missing('grid')
-
-    def test_invalid_insert_key_missing_3(self):
-        self._test_invalid_insert_key_missing('cell')
-
-    def test_invalid_insert_invalid_value(self):
-        inputGrid = [ 0,-2, 0, 0,-1, 0, 0,-4, 0,
-                     -8, 0,-1,-9, 0, 0, 0, 0,-5,
-                      0, 0, 0, 0,-3, 0, 0,-1, 0,
-                      0,-3, 0, 0, 0, 0,-4, 0,-6,
-                     -5, 0,-9, 0, 0, 0, 0, 0,-7,
-                      0, 0, 0, 0, 0, 0,-2,-8, 0,
-                     -2, 0, 0,-6, 0, 0, 0, 0, 0, 0,-1,-4, 0,-6, 0,
-                      0, 0,-6, 0, 0,-3, 0, 0, 0,-2, 0, 0,-1, 0,-9,
-                      0,-4, 0,-5,-7, 0, 0, 0, 0, 0, 0,-7, 0, 0,-5,
-                                        0, 0,-6, 0, 0, 0, 0,-9, 0,
-                                       -2, 0, 0, 0, 0, 0,-4, 0,-8,
-                                       -7, 0,-9, 0, 0, 0, 0, 0, 0,
-                                        0,-5, 0, 0,-9, 0, 0, 0, 0,
-                                       -4, 0, 0,-6, 0,-3,-9, 0, 0,
-                                        0,-6, 0, 0,-5, 0, 0,-3,-1]
-        inputParmDict = {
-                            'op': 'insert',
-                            'cell': 'r1c1',
-                            'value': '10',
-                            'integrity': _get_integrity(inputGrid),
-                            'grid': f'[{",".join(map(str, inputGrid))}]'
-                         }
-
-        expectedOutputGrid = inputGrid.copy()
-        expectedOutputGrid[0] = 1
-
-        expectedStatus = 'error: invalid'
-        exptectedKeyCount = 1
-
-        actualResult = self.microservice(inputParmDict)
-        
-        actualKeyCount = len(actualResult)
-        self.assertEqual(actualKeyCount, exptectedKeyCount)
-
-        actualStatusValue = actualResult.get(self.statusKey, '')
-        self.assertEqual(actualStatusValue.startswith(expectedStatus), True)
-
-    def test_invalid_insert_invalid_integrity(self):
-        inputGrid = [ 0,-2, 0, 0,-1, 0, 0,-4, 0,
-                     -8, 0,-1,-9, 0, 0, 0, 0,-5,
-                      0, 0, 0, 0,-3, 0, 0,-1, 0,
-                      0,-3, 0, 0, 0, 0,-4, 0,-6,
-                     -5, 0,-9, 0, 0, 0, 0, 0,-7,
-                      0, 0, 0, 0, 0, 0,-2,-8, 0,
-                     -2, 0, 0,-6, 0, 0, 0, 0, 0, 0,-1,-4, 0,-6, 0,
-                      0, 0,-6, 0, 0,-3, 0, 0, 0,-2, 0, 0,-1, 0,-9,
-                      0,-4, 0,-5,-7, 0, 0, 0, 0, 0, 0,-7, 0, 0,-5,
-                                        0, 0,-6, 0, 0, 0, 0,-9, 0,
-                                       -2, 0, 0, 0, 0, 0,-4, 0,-8,
-                                       -7, 0,-9, 0, 0, 0, 0, 0, 0,
-                                        0,-5, 0, 0,-9, 0, 0, 0, 0,
-                                       -4, 0, 0,-6, 0,-3,-9, 0, 0,
-                                        0,-6, 0, 0,-5, 0, 0,-3,-1]
-        inputParmDict = {
-                            'op': 'insert',
-                            'cell': 'r1c1',
-                            'value': '1',
-                            'integrity': _get_integrity(inputGrid),
-                            'grid': f'[{",".join(map(str, inputGrid))}]'
-                         }
-
-        inputParmDict['integrity'] = inputParmDict['integrity'][:-1]+'@'
-
-        expectedOutputGrid = inputGrid.copy()
-        expectedOutputGrid[0] = 1
-        expectedStatus = "error: integrity mismatch"
-        exptectedKeyCount = 1
-
-        actualResult = self.microservice(inputParmDict)
-        
-        actualKeyCount = len(actualResult)
-        self.assertEqual(actualKeyCount, exptectedKeyCount)
-
-        actualStatusValue = actualResult.get(self.statusKey, '')
-        self.assertEqual(actualStatusValue.startswith(expectedStatus), True)
+    def test110_020AbormalInput(self):
+        expectedResult = {'status':'error: missing cell reference'}
+        parms = {'op': 'insert', 'value': '1', 
+                 'grid': '[0,-2,0,0,-1,0,0,-4,0,-8,0,-1,-9,0,0,0,0,-5,0,0,0,0,-3,0,0,-1,0,0,-3,0,0,0,0,-4,0,-6,-5,0,-9,0,0,0,0,0,-7,0,0,0,0,0,0,-2,-8,0,-2,0,0,-6,0,0,0,0,0,0,-1,-4,0,-6,0,0,0,-6,0,0,-3,0,0,0,-2,0,0,-1,0,-9,0,-4,0,-5,-7,0,0,0,0,0,0,-7,0,0,-5,0,0,-6,0,0,0,0,-9,0,-2,0,0,0,0,0,-4,0,-8,-7,0,-9,0,0,0,0,0,0,0,-5,0,0,-9,0,0,0,0,-4,0,0,-6,0,-3,-9,0,0,0,-6,0,0,-5,0,0,-3,-1]', 
+                 'integrity': 'e734231e'}
+        result = insert._insert(parms)
+        self.assertDictEqual(expectedResult, result)
+    
+    def test110_030AbormalInput(self):
+        expectedResult = {'status':'error: invalid value'}
+        parms = {'op': 'insert', 'value': 'a', 'cell': 'r7c9', 
+                 'grid': '[0,-2,0,0,-1,0,0,-4,0,-8,0,-1,-9,0,0,0,0,-5,0,0,0,0,-3,0,0,-1,0,0,-3,0,0,0,0,-4,0,-6,-5,0,-9,0,0,0,0,0,-7,0,0,0,0,0,0,-2,-8,0,-2,0,0,-6,0,0,0,0,0,0,-1,-4,0,-6,0,0,0,-6,0,0,-3,0,0,0,-2,0,0,-1,0,-9,0,-4,0,-5,-7,0,0,0,0,0,0,-7,0,0,-5,0,0,-6,0,0,0,0,-9,0,-2,0,0,0,0,0,-4,0,-8,-7,0,-9,0,0,0,0,0,0,0,-5,0,0,-9,0,0,0,0,-4,0,0,-6,0,-3,-9,0,0,0,-6,0,0,-5,0,0,-3,-1]', 
+                 'integrity': '31993d46'}
+        result = insert._insert(parms)
+        self.assertDictEqual(expectedResult, result)
+    
+    def test110_040AbormalInput(self):
+        expectedResult = {'status':'error: attempt to change fixed hint'}
+        parms = {'op': 'insert', 'value': '1', 'cell': 'r1c2', 
+                 'grid': '[0,-2,0,0,-1,0,0,-4,0,-8,0,-1,-9,0,0,0,0,-5,0,0,0,0,-3,0,0,-1,0,0,-3,0,0,0,0,-4,0,-6,-5,0,-9,0,0,0,0,0,-7,0,0,0,0,0,0,-2,-8,0,-2,0,0,-6,0,0,0,0,0,0,-1,-4,0,-6,0,0,0,-6,0,0,-3,0,0,0,-2,0,0,-1,0,-9,0,-4,0,-5,-7,0,0,0,0,0,0,-7,0,0,-5,0,0,-6,0,0,0,0,-9,0,-2,0,0,0,0,0,-4,0,-8,-7,0,-9,0,0,0,0,0,0,0,-5,0,0,-9,0,0,0,0,-4,0,0,-6,0,-3,-9,0,0,0,-6,0,0,-5,0,0,-3,-1]', 
+                 'integrity': 'ba545fad'}
+        result = insert._insert(parms)
+        self.assertDictEqual(expectedResult, result)
+    
+    def test110_050AbormalInput(self):
+        expectedResult = {'status':'error: invalid grid'}
+        parms = {'op': 'insert', 'value': '1', 'cell': 'r10c1', 
+                 'grid': '[a,-2,0,0,-1,0,0,-4,0,-8,0,-1,-9,0,0,0,0,-5,0,0,0,0,-3,0,0,-1,0,0,-3,0,0,0,0,-4,0,-6,-5,0,-9,0,0,0,0,0,-7,0,0,0,0,0,0,-2,-8,0,-2,0,0,-6,0,0,0,0,0,0,-1,-4,0,-6,0,0,0,-6,0,0,-3,0,0,0,-2,0,0,-1,0,-9,0,-4,0,-5,-7,0,0,0,0,0,0,-7,0,0,-5,0,0,-6,0,0,0,0,-9,0,-2,0,0,0,0,0,-4,0,-8,-7,0,-9,0,0,0,0,0,0,0,-5,0,0,-9,0,0,0,0,-4,0,0,-6,0,-3,-9,0,0,0,-6,0,0,-5,0,0,-3,-1]', 
+                 'integrity': 'f0c31993'}
+        result = insert._insert(parms)
+        self.assertDictEqual(expectedResult, result)
+    
+    def test110_060AbormalInput(self):
+        expectedResult = {'status':'error: integrity mismatch'}
+        parms = {'op': 'insert', 'value': '3', 'cell': 'r7c9', 
+                 'grid': '[0,-2,0,0,-1,0,0,-4,0,-8,0,-1,-9,0,0,0,0,-5,0,0,0,0,-3,0,0,-1,0,0,-3,0,0,0,0,-4,0,-6,-5,0,-9,0,0,0,0,0,-7,0,0,0,0,0,0,-2,-8,0,-2,0,0,-6,0,0,0,0,0,0,-1,-4,0,-6,0,0,0,-6,0,0,-3,0,0,0,-2,0,0,-1,0,-9,0,-4,0,-5,-7,0,0,0,0,0,0,-7,0,0,-5,0,0,-6,0,0,0,0,-9,0,-2,0,0,0,0,0,-4,0,-8,-7,0,-9,0,0,0,0,0,0,0,-5,0,0,-9,0,0,0,0,-4,0,0,-6,0,-3,-9,0,0,0,-6,0,0,-5,0,0,-3,-1]', 
+                 'integrity': '1234abcd'}
+        result = insert._insert(parms)
+        self.assertDictEqual(expectedResult, result)
+    
+    def test110_070AbormalInput(self):
+        expectedResult = {'status':'error: invalid value'}
+        parms = {'op': 'insert', 'value': '0', 'cell': 'r1c1', 
+                 'grid': '[0,-2,0,0,-1,0,0,-4,0,-8,0,-1,-9,0,0,0,0,-5,0,0,0,0,-3,0,0,-1,0,0,-3,0,0,0,0,-4,0,-6,-5,0,-9,0,0,0,0,0,-7,0,0,0,0,0,0,-2,-8,0,-2,0,0,-6,0,0,0,0,0,0,-1,-4,0,-6,0,0,0,-6,0,0,-3,0,0,0,-2,0,0,-1,0,-9,0,-4,0,-5,-7,0,0,0,0,0,0,-7,0,0,-5,0,0,-6,0,0,0,0,-9,0,-2,0,0,0,0,0,-4,0,-8,-7,0,-9,0,0,0,0,0,0,0,-5,0,0,-9,0,0,0,0,-4,0,0,-6,0,-3,-9,0,0,0,-6,0,0,-5,0,0,-3,-1]', 
+                 'integrity': 'f0c31993'}
+        result = insert._insert(parms)
+        self.assertDictEqual(expectedResult, result)

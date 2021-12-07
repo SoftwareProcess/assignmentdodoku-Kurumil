@@ -72,5 +72,3 @@ def _get_grid_sha256(grid):
     concat_columns = _getcolumn(grid)
     hash_str = hashlib.sha256(concat_columns.encode()).hexdigest()
     return hash_str
-
-

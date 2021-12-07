@@ -3,8 +3,9 @@
     
     @author:    Mingcong Li
 '''    
-import re
+
 import json
+import re
 
 from dodoku import create
 
